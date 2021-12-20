@@ -88,14 +88,14 @@ async function loadPrompt() {
       return viewEmployeesByDepartment();
     case 'VIEW_EMPLOYEES_BY_MANAGER':
       return viewEmployeesByManager();
+    case 'VIEW_ROLES':
+      return viewRoles();
     case 'ADD_EMPLOYEE':
       return addEmployee();
     case 'REMOVE_EMPLOYEE':
       return removeEmployee();
     case 'UPDATE_EMPLOYEE_ROLE':
       return updateEmployeeRole();
-    case 'VIEW_ROLES':
-      return viewRoles();
       default:
         return quit();
   }
@@ -113,13 +113,63 @@ function viewEmployees () {
 
   db.query(query, (err, res) => {
     if (err) console.log(err);
-    // console.log('VIEW ALL EMPLOYEES');
+    console.log('\n');
+    console.log('Viewing all Employees:')
     console.table(res);
     loadPrompt();
   });
 
 }
 
+function viewEmployeesByDepartment() {
+  const query = `SELECT department.name AS department, role.title, employee.id, employee.first_name, employee.last_name
+    FROM employee
+    LEFT JOIN role ON (role.id = employee.role_id)
+    LEFT JOIN department ON (department.id = role.department_id)
+    ORDER BY department.name;`;
+  db.query(query, (err, res) => {
+    if (err) console.log(err);
+    console.log('\n');
+    console.log('Viewing employees by Department');
+    console.table(res);
+    loadPrompt();
+  });
+}
+
+
+function viewEmployeesByManager() {
+  const query = `SELECT CONCAT(manager.first_name, ' ', manager.last_name) AS manager, department.name AS department, employee.id, employee.first_name, employee.last_name, role.title
+    FROM employee
+    LEFT JOIN employee manager on manager.id = employee.manager_id
+    INNER JOIN role ON (role.id = employee.role_id && employee.manager_id != 'NULL')
+    INNER JOIN department ON (department.id = role.department_id)
+    ORDER BY manager;`;
+  db.query(query, (err, res) => {
+    if (err) console.log(err);
+    console.log('\n');
+    console.log('Viewing Employess by Manager:')
+    console.table(res);
+    loadPrompt();
+  });
+}
+
+
+
+function viewRoles() {
+  const query = `SELECT role.title, employee.id, employee.first_name, employee.last_name, department.name AS department
+    FROM employee
+    LEFT JOIN role ON (role.id = employee.role_id)
+    LEFT JOIN department ON (department.id = role.department_id)
+    ORDER BY role.title;`;
+  db.query(query, (err, res) => {
+    if (err) consol.log(err);
+    console.log('\n');
+    console.log('Viewing all roles');
+    console.table(res);
+    loadPrompt();
+  });
+
+}
 
 
 
