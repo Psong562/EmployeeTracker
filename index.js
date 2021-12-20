@@ -13,27 +13,27 @@
 
 
 
-const { promp } = require ('inquirer')
-const logo = require ('asciiart-logo')
-const db = require ('./db')
+const { prompt } = require('inquirer')
+const logo = require('asciiart-logo')
+const db = require('./db')
 const { initial } = require('lodash')
-require ('console.table')
+require('console.table')
 
-init() ;
+init();
 
-function  init() {
-    const logoText = logo ({name :'Employee Tracker'}).render();
-    console.log(logoText)
-    loadPrompt();
+function init() {
+  const logoText = logo({ name: 'Employee Tracker' }).render();
+  console.log(logoText)
+  loadPrompt();
 }
 
-async function loadPromp() {
-  const { choice } = await prompt ([
+async function loadPrompt() {
+  const { choice } = await prompt([
     {
       type: 'list',
       name: 'choice',
       message: 'Please choose what you would like to do?',
-      choices :[
+      choices: [
         {
           name: 'View All Employees',
           value: 'VIEW_EMPLOYEES'
@@ -47,6 +47,10 @@ async function loadPromp() {
           value: 'VIEW_EMPLOYEES_BY_MANAGER'
         },
         {
+          name: 'VIEW all roles',
+          value: 'VIEW_ROLES'
+        },
+        {
           name: 'ADD Employee',
           value: 'ADD_EMPLOYEE'
         },
@@ -56,39 +60,7 @@ async function loadPromp() {
         },
         {
           name: 'UPDATE Employee ROLE',
-          value: 'UPDATE_EMPLOYEE+ROLE'
-        },
-        {
-          name: 'UPDATE Employees MANAGER',
-          value: 'UPDATE_EMPLOYEE_MANAGER'
-        },
-        {
-          name: 'VIEW all roles',
-          value: 'VIEW_ROLES'
-        },
-        {
-          name: 'ADD roles',
-          value: 'ADD_ROLES'
-        },
-        {
-          name: 'REMOVE roles',
-          value: 'REMOVE_ROLES'
-        },
-        {
-          name: 'VIEW all departments',
-          value: 'VIEW_DEPARTMENTS'
-        },
-        {
-          name: 'ADD departments',
-          value: 'ADD_DEPARTMENTS'
-        },
-        {
-          name: 'REMOVE departments',
-          value: 'REMOVE_DEPARTMENTS'
-        },
-        {
-          name: 'VIEW all departments',
-          value: 'VIEW_DEPARTMENTS'
+          value: 'UPDATE_EMPLOYEE_ROLE'
         },
         {
           name: 'Quit',
@@ -97,8 +69,36 @@ async function loadPromp() {
       ]
     }
   ]);
-  
-// Using switch case call function on users choice
 
+  // Using switch case call function on users choice
+  switch (choice) {
+    case 'VIEW_EMPLOYEES':
+      return viewEmployees();
+    case 'VIEW_EMPLOYEES_BY_DEPARTMENT':
+      return viewEmployeesByDepartment();
+    case 'VIEW_EMPLOYEES_BY_MANAGER':
+      return viewEmployeesByManager();
+    case 'ADD_EMPLOYEE':
+      return addEmployee();
+    case 'REMOVE_EMPLOYEE':
+      return removeEmployee();
+    case 'UPDATE_EMPLOYEE_ROLE':
+      return updateEmployeeRole();
+    case 'VIEW_ROLES':
+      return viewRoles();
+      default:
+        return quit();
+  }
 
 }
+
+
+
+async function viewEmployees() {
+  const employees = await db.findAllEmployees();
+  console.log(employees);
+  
+}
+
+
+
