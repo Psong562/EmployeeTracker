@@ -15,11 +15,21 @@
 
 const { prompt } = require('inquirer')
 const logo = require('asciiart-logo')
-const db = require('./db')
+// const db = require('./db')
 const { initial } = require('lodash')
 require('console.table')
+const mysql = require('mysql2')
 
-init();
+const db = mysql.createConnection('mysql://root:rootroot@localhost:3306/employee_db')
+
+db.connect(err => {
+  if (err) console.log(err) ;
+  init();
+});
+
+
+
+
 
 function init() {
   const logoText = logo({ name: 'Employee Tracker' }).render();
@@ -93,12 +103,23 @@ async function loadPrompt() {
 }
 
 
+function viewEmployees () {
+  const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+    FROM employee
+    LEFT JOIN employee manager on manager.id = employee.manager_id
+    INNER JOIN role ON (role.id = employee.role_id)
+    INNER JOIN department ON (department.id = role.department_id)
+    ORDER BY employee.id;`;
 
-async function viewEmployees() {
-  const employees = await db.findAllEmployees();
-  console.log(employees);
-  
+  db.query(query, (err, res) => {
+    if (err) console.log(err);
+    // console.log('VIEW ALL EMPLOYEES');
+    console.table(res);
+    loadPrompt();
+  });
+
 }
+
 
 
 
