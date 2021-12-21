@@ -1,18 +1,3 @@
-// const express = require('express')
-// const path = require('path')
-
-// const app = express()
-
-// app.use(express.static(path.join(__dirname, 'public')))
-// app.use(express.urlencoded({ extended: true }))
-// app.use(express.json())
-
-// app.use(require('./routes'))
-
-// require('./db').connect(() => app.listen(3000))
-
-
-
 const { prompt } = require('inquirer')
 const logo = require('asciiart-logo')
 const mysql = require('mysql2')
@@ -322,6 +307,10 @@ async function updateEmployeeRole() {
   });
 }
 
+// function to quit out of node/inquirer
 async function quit() {
+  const logoText = logo({ name: 'Thank You for Using Employee Tracker' }).render();
+  console.log(logoText);
   process.exit(1)
+  
 }
