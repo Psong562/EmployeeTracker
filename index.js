@@ -186,6 +186,16 @@ function employeeName() {
     ]);
 }
 
+function askId() {
+  return ([
+    {
+      name: "name",
+      type: "input",
+      message: "What is the employe ID?:  "
+    }
+  ]);
+}
+
 
 
 async function addEmployee() {
@@ -253,4 +263,59 @@ async function addEmployee() {
     });
   });
 
+}
+
+async function removeEmployee () {
+
+    const answer = await prompt([
+      {
+        name: 'ID',
+        type: 'input',
+        message: 'What is the ID of the employee you want to remove '
+      },
+    
+    ]);
+  db.query(`DELETE FROM employee WHERE ?`,
+    {
+      id: answer.ID,
+    },
+    function (err) {
+      if (err) console.log(err);
+    }
+  )
+  
+  console.log('Employee has been removed on the system!');
+  
+  loadPrompt();
+
+}
+
+async function updateEmployeeRole() {
+  const employeeId = await prompt(askId());
+
+  db.query('SELECT role.id, role.title FROM role ORDER BY role.id;', async (err, res) => {
+    if (err) console.log(err);
+    const { role } = await prompt([
+      {
+        name: 'role',
+        type: 'list',
+        message: 'What is the new employee role?: ',
+        choices: () => res.map(res => res.title)
+      }
+    ]);
+    let roleId;
+    for (const row of res) {
+      if (row.title === role) {
+        roleId = row.id;
+        continue;
+      }
+    }
+    db.query(`UPDATE employee 
+        SET role_id = ${roleId}
+        WHERE employee.id = ${employeeId.name}`, async (err, res) => {
+      if (err) throw err;
+      console.log('Employee Role has been updated!')
+      loadPrompt();
+    });
+  });
 }
