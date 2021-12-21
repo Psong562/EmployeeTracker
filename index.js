@@ -171,5 +171,86 @@ function viewRoles() {
 
 }
 
+function employeeName() {
+    return ([
+      {
+          name:'first',
+          type:'input',
+          message:'What is the First Name'
+      },
+      {
+          name:'last',
+          type:'input',
+          message:'What is the Last Name'
+      },
+    ]);
+}
 
 
+
+async function addEmployee() {
+  const addName = await prompt(employeeName());
+  db.query('SELECT role.id, role.title FROM role ORDER BY role.id;', async (err, res) => {
+    if (err) console.log(err);
+    const { role } = await prompt([
+      {
+        name: 'role',
+        type: 'list',
+        message: 'What is the employee role?:',
+        choices: () => res.map(res => res.title)
+      }
+    ]);
+    let roleId;
+    for (const row of res) {
+      if (row.title === role) {
+        roleId = row.id;
+        continue;
+      }
+    }
+    db.query('SELECT * FROM employee', async (err, res) => {
+      if (err) console.log(err);
+      let choices = res.map(res => `${res.first_name} ${res.last_name}`);
+      choices.push('none');
+      let { manager } = await prompt([
+        {
+          name: 'manager',
+          type: 'list',
+          choices: choices,
+          message: 'Choose the employees Manager: '
+        }
+      ]);
+      let managerId;
+      let managerName;
+      if (manager === 'none') {
+        managerId = null;
+      } else {
+        for (const data of res) {
+          data.fullName = `${data.first_name} ${data.last_name}`;
+          if (data.fullName === manager) {
+            managerId = data.id;
+            managerName = data.fullName;
+            console.log(managerId);
+            console.log(managerName);
+            continue;
+          }
+        }
+      }
+      console.log('Employee has been added. Please view all employee to confirm...');
+      db.query(
+        'INSERT INTO employee SET ?',
+        {
+          first_name: addName.first,
+          last_name: addName.last,
+          role_id: roleId,
+          manager_id: parseInt(managerId)
+        },
+        (err, res) => {
+          if (err) console.log(err);
+          loadPrompt();
+
+        }
+      );
+    });
+  });
+
+}
