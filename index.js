@@ -18,20 +18,21 @@ const logo = require('asciiart-logo')
 const mysql = require('mysql2')
 require('console.table')
 
+// Create connection with my sql and databse
 const db = mysql.createConnection('mysql://root:rootroot@localhost:3306/employee_db')
-
 db.connect(err => {
   if (err) console.log(err) ;
   init();
 });
 
-
+// uses logo text to create title of application
 function init() {
   const logoText = logo({ name: 'Employee Tracker' }).render();
   console.log(logoText)
   loadPrompt();
 }
 
+// Loads prompt to ask questions about employees
 async function loadPrompt() {
   const { choice } = await prompt([
     {
@@ -97,7 +98,7 @@ async function loadPrompt() {
 
 }
 
-
+// function to view all employeses
 function viewEmployees () {
   const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
     FROM employee
@@ -116,6 +117,7 @@ function viewEmployees () {
 
 }
 
+// function to view all employees by department
 function viewEmployeesByDepartment() {
   const query = `SELECT department.name AS department, role.title, employee.id, employee.first_name, employee.last_name
     FROM employee
@@ -131,7 +133,7 @@ function viewEmployeesByDepartment() {
   });
 }
 
-
+// function to view employess by manager
 function viewEmployeesByManager() {
   const query = `SELECT CONCAT(manager.first_name, ' ', manager.last_name) AS manager, department.name AS department, employee.id, employee.first_name, employee.last_name, role.title
     FROM employee
@@ -149,7 +151,7 @@ function viewEmployeesByManager() {
 }
 
 
-
+// Function to view roles of all employess
 function viewRoles() {
   const query = `SELECT role.title, employee.id, employee.first_name, employee.last_name, department.name AS department
     FROM employee
@@ -166,6 +168,8 @@ function viewRoles() {
 
 }
 
+
+// Prompt to ask for employees name. Used to add an employee
 function employeeName() {
     return ([
       {
@@ -181,6 +185,7 @@ function employeeName() {
     ]);
 }
 
+// Prompt to ask for ID, used for update employee
 function askId() {
   return ([
     {
@@ -192,7 +197,7 @@ function askId() {
 }
 
 
-
+// function to add employee
 async function addEmployee() {
   const addName = await prompt(employeeName());
   db.query('SELECT role.id, role.title FROM role ORDER BY role.id;', async (err, res) => {
@@ -260,6 +265,7 @@ async function addEmployee() {
 
 }
 
+// function to rmove employee
 async function removeEmployee () {
 
     const answer = await prompt([
@@ -285,6 +291,7 @@ async function removeEmployee () {
 
 }
 
+// function to update employee using ID function above
 async function updateEmployeeRole() {
   const employeeId = await prompt(askId());
 
