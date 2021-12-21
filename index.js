@@ -314,3 +314,7 @@ async function updateEmployeeRole() {
     });
   });
 }
+
+async function quit() {
+  process.exit(1)
+}
