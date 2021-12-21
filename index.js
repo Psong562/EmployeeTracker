@@ -15,10 +15,8 @@
 
 const { prompt } = require('inquirer')
 const logo = require('asciiart-logo')
-// const db = require('./db')
-const { initial } = require('lodash')
-require('console.table')
 const mysql = require('mysql2')
+require('console.table')
 
 const db = mysql.createConnection('mysql://root:rootroot@localhost:3306/employee_db')
 
@@ -26,9 +24,6 @@ db.connect(err => {
   if (err) console.log(err) ;
   init();
 });
-
-
-
 
 
 function init() {
